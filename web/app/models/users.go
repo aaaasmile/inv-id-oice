@@ -21,7 +21,7 @@ func (mh *ModelHandler) handleUsers(w http.ResponseWriter) error {
 	case "GET":
 		id := mh.req.URL.Query().Get("id")
 		if id != "" {
-			return mh.viewSingleUser(id, w)
+			return mh.viewOrEditSingleUser(id, w)
 		} else {
 			return mh.viewAllUsers(w)
 		}
@@ -68,18 +68,14 @@ func (mh *ModelHandler) viewAllUsers(w http.ResponseWriter) error {
 	return err
 }
 
-func (mh *ModelHandler) viewSingleUser(id string, w http.ResponseWriter) error {
+func (mh *ModelHandler) viewOrEditSingleUser(id string, w http.ResponseWriter) error {
 	if mh.debug {
 		log.Println("provides Single User View/Edit", mh.req.Method)
 	}
 	if _, ok := g_users[id]; !ok {
 		return fmt.Errorf("key %s not found", id)
 	}
-	pagectx := struct {
-		User idl.User
-	}{
-		User: g_users[id],
-	}
+	pagectx := g_users[id]
 	templName := "templates/app/views/users.html"
 
 	tmpl := template.Must(template.New("User").ParseFiles(util.GetFullPath(templName)))
@@ -100,11 +96,13 @@ func (mh *ModelHandler) viewSingleUser(id string, w http.ResponseWriter) error {
 
 func (mh *ModelHandler) updateSingleUser(id string, w http.ResponseWriter) error {
 	if mh.debug {
-		log.Println("Update user ", mh.req.Method)
+		log.Printf("Update user %s with id %s", mh.req.Method, id)
 	}
 	if v, ok := g_users[id]; ok {
 		name := mh.req.PostFormValue("name")
+		email := mh.req.PostFormValue("email")
 		v.Name = name
+		v.Email = email
 		g_users[id] = v
 	} else {
 		return fmt.Errorf("key %s not found", id)
@@ -115,7 +113,7 @@ func (mh *ModelHandler) updateSingleUser(id string, w http.ResponseWriter) error
 
 func (mh *ModelHandler) deleteSingleUser(id string, w http.ResponseWriter) error {
 	if mh.debug {
-		log.Println("Single User Delte", mh.req.Method)
+		log.Println("Single User Delete", mh.req.Method)
 	}
 	if _, ok := g_users[id]; !ok {
 		return fmt.Errorf("key %s not found", id)

@@ -19,32 +19,34 @@
 
 {{- define "single_user" -}}
 <section>
-    <h2>User {{.User.Name}}</h2>
+    <h2>User {{.Name}}</h2>
     <article>
-        <p>Email: {{.User.Email}}</p>
-        <p>Enabled: {{.User.Enabled}}</p>
+        <p>Email: {{.Email}}</p>
+        <p>Enabled: {{.Enabled}}</p>
     </article>
 </section>
 {{- end}}
 
 {{- define "edit_user" -}}
 <section>
-    <h2>Edit User {{.User.Name}}</h2>
+    <h2>Edit {{.Name}}</h2>
     <article>
-        <form hx-put="/app/users/?id={{.User.Id}}" hx-target="#content" class="user-form">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" value="{{.User.Name}}" required class="form-control">
-            </div>
+        <form hx-put="/app/users/?id={{.Id}}" hx-target="#content">
+            <fieldset>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{.Name}}" required>
+                <label for="name">Email</label>
+                <input type="text" id="email" name="email" value="{{.Email}}" required>
+            </fieldset>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
+            <fieldset class="cmd">
+                <button type="submit">
                     Update User
                 </button>
-                <button type="button" class="btn btn-secondary" hx-get="/app/users" hx-target="#content" hx-push-url="true">
+                <button type="button" hx-get="/app/users" hx-target="#content" hx-push-url="true">
                     Cancel
                 </button>
-            </div>
+            </fieldset>
         </form>
     </article>
 </section>
