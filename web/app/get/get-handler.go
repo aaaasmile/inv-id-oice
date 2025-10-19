@@ -1,4 +1,4 @@
-package app
+package get
 
 import (
 	"fmt"
@@ -10,28 +10,34 @@ import (
 )
 
 type PageCtx struct {
-	RootUrl        string
-	Buildnr        string
-	ServerName     string
-	VuetifyLibName string
-	VueLibName     string
+	RootUrl string
 }
 
-type GetHandler struct {
+type TypeGetHandler struct {
 	debug         bool
 	lastPath      string
+	remPath       string
 	liteCommentDB *db.LiteDB
 }
 
-func (gh *GetHandler) handleGet(w http.ResponseWriter, req *http.Request, status *int) error {
+func NewTypeGetHandler(dbg bool, litedb *db.LiteDB) *TypeGetHandler {
+	ret := TypeGetHandler{debug: dbg, liteCommentDB: litedb}
+	return &ret
+}
+
+func (gh *TypeGetHandler) HandleGet(w http.ResponseWriter, req *http.Request, status *int) error {
 	u, _ := url.Parse(req.RequestURI)
 
 	log.Println("GET requested ", u)
 
 	remPath := ""
-	gh.lastPath, remPath = getLastPathInUri(req.RequestURI)
+	gh.lastPath, gh.remPath = getLastPathInUri(req.RequestURI)
 	if gh.debug {
 		log.Println("Check the last path ", gh.lastPath, remPath)
+	}
+	switch gh.lastPath {
+	case "users":
+		gh.handleUsers(w)
 	}
 
 	*status = http.StatusNotFound

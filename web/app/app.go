@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"inv-id-oice/conf"
 	"inv-id-oice/db"
+	"inv-id-oice/web/app/get"
+	"inv-id-oice/web/app/post"
 	"log"
 	"net/http"
 )
@@ -26,11 +28,8 @@ func (ap *App) APiHandler(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		status := http.StatusOK
-		gh := GetHandler{
-			debug:         conf.Current.Debug,
-			liteCommentDB: ap.liteDB,
-		}
-		if err := gh.handleGet(w, req, &status); err != nil {
+		gh := get.NewTypeGetHandler(conf.Current.Debug, ap.liteDB)
+		if err := gh.HandleGet(w, req, &status); err != nil {
 			log.Println("Error on process request: ", err)
 			if status == http.StatusNotFound {
 				http.Error(w, "404 - Not found", http.StatusNotFound)
@@ -39,11 +38,8 @@ func (ap *App) APiHandler(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 	case "POST":
-		ph := PostHandler{
-			debug:  conf.Current.Debug,
-			liteDB: ap.liteDB,
-		}
-		if err := ph.handlePost(w, req); err != nil {
+		ph := post.NewPostHandler(conf.Current.Debug, ap.liteDB)
+		if err := ph.HandlePost(w, req); err != nil {
 			log.Println("[POST] Error: ", err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 			return
