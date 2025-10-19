@@ -23,6 +23,9 @@ func (mh *ModelHandler) handleUsers(w http.ResponseWriter) error {
 		if id != "" {
 			return mh.viewOrEditSingleUser(id, w)
 		} else {
+			if mh.req.URL.Query().Get("new") == "1" {
+				return mh.viewAddNewUser(w)
+			}
 			return mh.viewAllUsers(w)
 		}
 	case "PUT":
@@ -30,15 +33,17 @@ func (mh *ModelHandler) handleUsers(w http.ResponseWriter) error {
 		if id != "" {
 			return mh.updateSingleUser(id, w)
 		} else {
-			return fmt.Errorf("id %s to edit not found", id)
+			return fmt.Errorf("PUT: id %s to edit not found", id)
 		}
 	case "DELETE":
 		id := mh.req.URL.Query().Get("id")
 		if id != "" {
 			return mh.deleteSingleUser(id, w)
 		} else {
-			return fmt.Errorf("id %s to delete not found", id)
+			return fmt.Errorf("DELETE id %s to delete not found", id)
 		}
+	case "POST":
+		return mh.addUser(w)
 	default:
 		return fmt.Errorf("method %s not suported", mh.req.Method)
 	}
@@ -119,6 +124,48 @@ func (mh *ModelHandler) deleteSingleUser(id string, w http.ResponseWriter) error
 		return fmt.Errorf("key %s not found", id)
 	}
 	delete(g_users, id)
+
+	return mh.viewAllUsers(w)
+}
+
+func (mh *ModelHandler) viewAddNewUser(w http.ResponseWriter) error {
+	if mh.debug {
+		log.Println("view add new user form", mh.req.Method)
+	}
+
+	pagectx := idl.User{}
+	templName := "templates/app/views/users.html"
+
+	tmpl := template.Must(template.New("User").ParseFiles(util.GetFullPath(templName)))
+
+	section_name := "new_user"
+
+	return tmpl.ExecuteTemplate(w, section_name, pagectx)
+}
+
+func (mh *ModelHandler) addUser(w http.ResponseWriter) error {
+	if mh.debug {
+		log.Println("New User", mh.req.Method)
+	}
+	nextId := 0
+	for key := range g_users {
+		uu := g_users[key]
+		if uu.Id > nextId {
+			nextId = uu.Id
+		}
+	}
+	nextId += 1
+
+	v := idl.User{}
+	name := mh.req.PostFormValue("name")
+	email := mh.req.PostFormValue("email")
+	v.Name = name
+	v.Email = email
+	// TODO Error handling on validation
+
+	v.Id = nextId
+	id := fmt.Sprintf("%d", nextId)
+	g_users[id] = v
 
 	return mh.viewAllUsers(w)
 }
