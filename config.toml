@@ -5,5 +5,5 @@ StaticAppDir = "app"
 RootURLPattern = "/app/"
 
 [Database]
-DbFileName = "inv-ido-voice.db"
+DbFileName = "inv-id-oice.db"
 SQLDebug = false
