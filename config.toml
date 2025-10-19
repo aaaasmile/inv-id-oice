@@ -1,0 +1,9 @@
+SimulateAlarm = false
+Debug = false
+ServiceURL = "127.0.0.1:5573"
+StaticAppDir = "app"
+RootURLPattern = "/app/"
+
+[Database]
+DbFileName = "inv-ido-voice.db"
+SQLDebug = false

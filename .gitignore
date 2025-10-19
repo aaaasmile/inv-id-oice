@@ -1,0 +1,4 @@
+config_custom.toml
+*.exe
+*.bin
+
