@@ -1,0 +1,15 @@
+{{- define "users" -}}
+<section>
+    <h2>User List</h2>
+    <article>
+        {{- range .Users}}
+            <h3>{{.Name}}</h3>
+                <p>Email: {{.Email}}</p>
+                <p>Enabled: {{.Enabled}}</p>
+                <button class="edit-btn" 
+                        hx-update="/app/users?id={{.Id}}" 
+                        hx-target="#content">Edit</button>
+        {{- end}}
+    </article>
+</section>
+{{- end}}

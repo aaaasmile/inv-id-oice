@@ -2,9 +2,9 @@ package post
 
 import (
 	"inv-id-oice/db"
+	"inv-id-oice/util"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func NewPostHandler(dbg bool, litedb *db.LiteDB) *PostHandler {
 func (ph *PostHandler) HandlePost(w http.ResponseWriter, req *http.Request) error {
 	ph.start = time.Now()
 	remPath := ""
-	ph.lastPath, remPath = getLastPathInUri(req.RequestURI)
+	ph.lastPath, remPath = util.GetLastPathInUri(req.RequestURI)
 	if ph.debug {
 		log.Println("[handlePost] uri requested is: ", ph.lastPath, remPath)
 	}
@@ -31,19 +31,4 @@ func (ph *PostHandler) HandlePost(w http.ResponseWriter, req *http.Request) erro
 	elapsed := time.Since(ph.start)
 	log.Printf("[WARN] ignored request. Total call duration: %v\n", elapsed)
 	return nil
-}
-
-func getLastPathInUri(uri string) (string, string) {
-	arr := strings.Split(uri, "/")
-	for i := len(arr) - 1; i >= 0; i-- {
-		last := arr[i]
-		rem_ix := i
-		if last != "" {
-			if !strings.HasPrefix(last, "?") {
-				remPath := strings.Join(arr[0:rem_ix], "/")
-				return last, remPath
-			}
-		}
-	}
-	return uri, ""
 }

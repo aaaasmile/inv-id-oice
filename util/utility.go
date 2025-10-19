@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/kardianos/osext"
 )
@@ -38,4 +39,19 @@ func PseudoUuid() (string, error) {
 	}
 	uuid := fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 	return uuid, nil
+}
+
+func GetLastPathInUri(uri string) (string, string) {
+	arr := strings.Split(uri, "/")
+	for i := len(arr) - 1; i >= 0; i-- {
+		last := arr[i]
+		rem_ix := i
+		if last != "" {
+			if !strings.HasPrefix(last, "?") {
+				remPath := strings.Join(arr[0:rem_ix], "/")
+				return last, remPath
+			}
+		}
+	}
+	return uri, ""
 }
