@@ -3,13 +3,49 @@
     <h2>User List</h2>
     <article>
         {{- range .Users}}
-            <h3>{{.Name}}</h3>
-                <p>Email: {{.Email}}</p>
-                <p>Enabled: {{.Enabled}}</p>
-                <button class="edit-btn" 
-                        hx-update="/app/users?id={{.Id}}" 
-                        hx-target="#content">Edit</button>
+        <h3>{{.Name}}</h3>
+        <p>Email: {{.Email}}</p>
+        <p>Enabled: {{.Enabled}}</p>
+        <p>Id: {{.Id}}</p>
+        <button class="edit-btn" hx-get="/app/users/?id={{.Id}}&edit=1" hx-target="#content">Edit</button>
+        <button class="btn-delete" hx-delete="/app/users/?id={{.Id}}" hx-target="#content"
+            hx-confirm="Are you sure you want to delete {{.Name}}?">
+            Delete
+        </button>
         {{- end}}
+    </article>
+</section>
+{{- end}}
+
+{{- define "single_user" -}}
+<section>
+    <h2>User {{.User.Name}}</h2>
+    <article>
+        <p>Email: {{.User.Email}}</p>
+        <p>Enabled: {{.User.Enabled}}</p>
+    </article>
+</section>
+{{- end}}
+
+{{- define "edit_user" -}}
+<section>
+    <h2>Edit User {{.User.Name}}</h2>
+    <article>
+        <form hx-put="/app/users/?id={{.User.Id}}" hx-target="#content" class="user-form">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="{{.User.Name}}" required class="form-control">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    Update User
+                </button>
+                <button type="button" class="btn btn-secondary" hx-get="/app/users" hx-target="#content" hx-push-url="true">
+                    Cancel
+                </button>
+            </div>
+        </form>
     </article>
 </section>
 {{- end}}

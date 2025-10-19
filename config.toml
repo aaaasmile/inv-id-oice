@@ -1,5 +1,5 @@
 SimulateAlarm = false
-Debug = false
+Debug = true
 ServiceURL = "127.0.0.1:5573"
 StaticAppDir = "app"
 RootURLPattern = "/app/"
