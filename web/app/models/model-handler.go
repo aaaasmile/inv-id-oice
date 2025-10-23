@@ -37,6 +37,8 @@ func (mh *ModelHandler) HandleModel(w http.ResponseWriter, req *http.Request, st
 	switch mh.lastPath {
 	case "users":
 		return mh.handleUsers(w)
+	case "login":
+		return mh.handleLogin(w)
 	}
 
 	*status = http.StatusNotFound
