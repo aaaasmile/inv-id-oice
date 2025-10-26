@@ -39,6 +39,8 @@ func (mh *ModelHandler) HandleModel(w http.ResponseWriter, req *http.Request, st
 		return mh.handleUsers(w)
 	case "login":
 		return mh.handleLogin(w)
+	case "sample_table":
+		return mh.viewSampleTable(w)
 	}
 
 	*status = http.StatusNotFound

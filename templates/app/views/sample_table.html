@@ -1,0 +1,533 @@
+{{- define "sample_table" -}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        button {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 10px 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .add-user-btn {
+            background: var(--success-color);
+        }
+
+        .add-user-btn:hover {
+            background: #27ae60;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background-color: var(--primary-dark);
+        }
+
+        th.sortable::after {
+            content: "↕";
+            margin-left: 5px;
+            opacity: 0.6;
+        }
+
+        th.asc::after {
+            content: "↑";
+            opacity: 1;
+        }
+
+        th.desc::after {
+            content: "↓";
+            opacity: 1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        td {
+            padding: 15px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background-color: #e8f4fc;
+            color: var(--primary-dark);
+        }
+
+        .role-editor {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .role-user {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit {
+            background-color: var(--warning-color);
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-edit:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            background-color: white;
+            color: var(--dark-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: var(--light-color);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filters {
+                justify-content: space-between;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Users Management</h1>
+        <p class="description">Manage your organization's users, roles, and permissions in one place</p>
+    </header>
+    
+    <main>
+        <section class="controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search" placeholder="Search users...">
+            </div>
+            <div class="filters">
+                <select id="role-filter">
+                    <option value="">All Roles</option>
+                    <option value="admin">Administrator</option>
+                    <option value="editor">Editor</option>
+                    <option value="user">User</option>
+                </select>
+                <select id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button class="add-user-btn" hx-get="/api/users/new" hx-target="#content">
+                <span>+</span> Add New User
+            </button>
+        </section>
+
+        <section class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="name">Name</th>
+                        <th class="sortable" data-sort="email">Email</th>
+                        <th class="sortable" data-sort="role">Role</th>
+                        <th class="sortable" data-sort="status">Status</th>
+                        <th class="sortable" data-sort="joined">Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <!-- This will be populated by Go template -->
+                    <tr>
+                        <td>John Doe</td>
+                        <td>john.doe@example.com</td>
+                        <td><span class="role-badge role-admin">Admin</span></td>
+                        <td><span class="status-active">Active</span></td>
+                        <td>2023-01-15</td>
+                        <td class="actions">
+                            <button class="btn-edit" hx-get="/api/users/John Doe" hx-target="#content">✏️</button>
+                            <button class="btn-delete" onclick="deleteUser('John Doe')">❌</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Jane Smith</td>
+                        <td>jane.smith@example.com</td>
+                        <td><span class="role-badge role-editor">Editor</span></td>
+                        <td><span class="status-active">Active</span></td>
+                        <td>2023-02-20</td>
+                        <td class="actions">
+                            <button class="btn-edit" hx-get="/api/users/Jane Smith" hx-target="#content">✏️</button>
+                            <button class="btn-delete" onclick="deleteUser('Jane Smith')">❌</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Robert Johnson</td>
+                        <td>robert.johnson@example.com</td>
+                        <td><span class="role-badge role-user">User</span></td>
+                        <td><span class="status-inactive">Inactive</span></td>
+                        <td>2023-03-10</td>
+                        <td class="actions">
+                            <button class="btn-edit" hx-get="/api/users/Robert Johnson" hx-target="#content">✏️</button>
+                            <button class="btn-delete" onclick="deleteUser('Robert Johnson')">❌</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="pagination">
+            <button id="prev-page" disabled>Previous</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button id="next-page">Next</button>
+        </section>
+    </main>
+    
+    <footer>
+        <p>Users Management System &copy; 2023</p>
+    </footer>
+
+    <script>
+        // Sample data - in real implementation, this would come from Go template
+        const users = [
+            { name: "John Doe", email: "john.doe@example.com", role: "admin", status: "active", joined: "2023-01-15" },
+            { name: "Jane Smith", email: "jane.smith@example.com", role: "editor", status: "active", joined: "2023-02-20" },
+            { name: "Robert Johnson", email: "robert.johnson@example.com", role: "user", status: "inactive", joined: "2023-03-10" },
+            { name: "Alice Brown", email: "alice.brown@example.com", role: "admin", status: "active", joined: "2023-04-05" },
+            { name: "Michael Wilson", email: "michael.wilson@example.com", role: "user", status: "active", joined: "2023-05-12" }
+        ];
+
+        // Sorting functionality
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.addEventListener('click', () => {
+                const sortBy = header.dataset.sort;
+                const isActive = header.classList.contains('active');
+                const isAsc = header.classList.contains('asc');
+                
+                // Reset other headers
+                document.querySelectorAll('.sortable').forEach(h => {
+                    h.classList.remove('active', 'asc', 'desc');
+                });
+                
+                // Set current header state
+                header.classList.add('active');
+                if (!isActive || isAsc) {
+                    header.classList.add('desc');
+                    sortTable(sortBy, 'desc');
+                } else {
+                    header.classList.add('asc');
+                    sortTable(sortBy, 'asc');
+                }
+            });
+        });
+
+        function sortTable(sortBy, direction) {
+            // In a real implementation, this would sort the actual data
+            console.log(`Sorting by ${sortBy} in ${direction} order`);
+            // You would update the table rows here based on sorted data
+        }
+
+        // Search functionality
+        document.getElementById('search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Filter table rows based on search term
+            const rows = document.querySelectorAll('#user-table-body tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Filter functionality
+        document.getElementById('role-filter').addEventListener('change', function(e) {
+            filterTable();
+        });
+
+        document.getElementById('status-filter').addEventListener('change', function(e) {
+            filterTable();
+        });
+
+        function filterTable() {
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const rows = document.querySelectorAll('#user-table-body tr');
+            
+            rows.forEach(row => {
+                const role = row.cells[2].textContent.toLowerCase();
+                const status = row.cells[3].textContent.toLowerCase();
+                
+                const roleMatch = !roleFilter || role.includes(roleFilter);
+                const statusMatch = !statusFilter || status.includes(statusFilter);
+                
+                if (roleMatch && statusMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Delete user function
+        function deleteUser(userName) {
+            if (confirm(`Are you sure you want to delete ${userName}?`)) {
+                // In a real implementation, this would make an API call
+                console.log(`Deleting user: ${userName}`);
+                // You would remove the row from the table or refresh the data
+            }
+        }
+
+        // Pagination functionality
+        document.querySelectorAll('.pagination button').forEach(button => {
+            if (!button.id) {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.pagination button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    // In real implementation, this would load the corresponding page
+                });
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', function() {
+            // Load next page
+            console.log('Loading next page');
+        });
+
+        document.getElementById('prev-page').addEventListener('click', function() {
+            // Load previous page
+            console.log('Loading previous page');
+        });
+    </script>
+</body>
+</html>
+{{- end}}
